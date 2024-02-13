@@ -1,24 +1,26 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List
 from typing import Optional
+import uuid
 import datetime
 
 app = FastAPI()
 
 tasks = []
-task_id_counter = 1
+
+def generate_task_id():
+    return str(uuid.uuid4())
 
 class Task(BaseModel):
-    task_id: str
+    task_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str
     description: Optional[str] = None
-    # created_date: datetime = datetime.datetime.now()
     created_by: Optional[str] = None
 
-@app.get("/")
-async def home():
-    return {"status": "success", "message": "Welcome to the Task Manager API"}
+    @app.get("/")
+    async def home():
+        return {"status": "success", "message": "Welcome to the Task Manager API"}
     
 @app.get("/tasks/", response_model = List[Task])
 async def get_tasks():
